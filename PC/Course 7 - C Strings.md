@@ -322,5 +322,81 @@ int main(void) {
 
 ## Memcmp
 - ``int memcmp(const void *s1, const void *s2, size_t n);``
+	- It compares the two memory blocks and returns:
+		- `0` if the values in the two memory zones are equal
+		- the difference between the first value that isn't equal in the memory blocks (`s1-s2`)
+	- Each byte is compared
+	- It doesn't verify if ``s1`` or ``s2`` are a NULL pointer or it's uninitialised.
 
-TODO: Memcpy, memcmp, atoi, strtol
+## Atoi
+- ``int atoi(const char *nptr);``
+	- Converts an 'ASCII' to 'Integer'
+	- The string ``nptr`` should contain a number in base 10
+	- Returns an integer with the converted value from the string
+	- The conversion ends when it reaches a character that's not a digit (or ``'\n', ' ', '\0``)
+```C
+#include <string.h> 
+#include <stdio.h> 
+#include <stdlib.h> 
+int main(void) { 
+	char text[10]; 
+	int nr = 0; 
+	printf ("introduceti un numar:"); 
+	scanf("%9s", text); 
+	nr = atoi(text); 
+	nr = nr + 1; 
+	printf ("numarul incrementat este: %d\n", nr); 
+	
+	return 0; 
+}
+```
+Output
+```C
+valy@staff:~/teaching$ ./p 
+introduceti un numar:17 
+numarul incrementat este: 18 
+valy@staff:~/teaching$
+```
+
+## Strtol
+- ``long int strtol(const char *nptr, char **endptr, int base);``
+	- Converts a string that contains a number in a specified base (<=36) 
+	- The function writes in ``endptr`` a pointer to where the conversion has stopped in ``nptr``
+	- The conversion ends when it reaches a character that's not a digit (or ``'\n', ' ', '\0``)
+```C
+#include <stdio.h> 
+#include <stdlib.h> 
+int main(void) { 
+	char text_dec[]="156320"; 
+	char text_hex[]="A09BD25"; 
+	char text_bin[]="01001001"; 
+	int n = 0; 
+	n = strtol(text_dec, NULL, 10); 
+	printf ("%d\n", n); 
+	n = strtol(text_hex, NULL, 16); 
+	printf ("%d - %X\n", n, n); 
+	n = strtol(text_bin, NULL, 2); 
+	printf ("%d\n", n); 
+	
+	return 0; 
+}
+```
+Output
+```Bash
+valy@staff:~/teaching$ ./p 
+156320 
+168410405 - A09BD25 
+73 
+valy@staff:~/teaching$
+```
+
+- Other string functions:
+```C
+long long int strtoll(const char *nptr, char **endptr, int base); 
+long atol(const char *nptr); 
+long long atoll(const char *nptr); 
+double atof(const char *nptr); 
+double strtod(const char *nptr, char **endptr); 
+float strtof(const char *nptr, char **endptr); 
+long double strtold(const char *nptr, char **endptr);
+```
