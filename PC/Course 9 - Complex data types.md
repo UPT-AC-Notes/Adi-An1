@@ -257,11 +257,71 @@ deplasament f: 16
 dimensiune structura: 20 
 valy@staff:~/teaching$
 ```
-#### Operations
-- Assignment between structs executes ``memcpy`` behind the scenes (slide 277).
-- We cannot use ``+, -, /, *, >, <, etc.`` operators between structs.
 
-- The ``->`` operator was invented to replace ``*().`` when using pointers to structures.
+#### Initialisation
+
+```C
+struct MyStruct { 
+	int n; 
+	char text[10]; 
+}; 
+int main(void) { 
+	struct MyStruct str3 = {78, "test"}; 
+	
+	return 0; 
+}
+```
+- We don't have to set all the fields in the initialisation, but we can't skip one.
+
+- The syntax above cannot however be used for assignment:
+```C
+struct MyStruct { 
+	int n; 
+	char text[10]; 
+}; 
+int main(void) { 
+	struct MyStruct str3; 
+	str3 = {65, "abc"}; 
+	
+	return 0; 
+}
+```
+Output:
+```Bash
+valy@staff:~/teaching$ gcc -Wall -o p struct1.c 
+struct1.c: In function ‘main’: 
+struct1.c:10:10: error: expected expression before ‘{’ token 
+	str3 = {65, "abc"}; 
+		   ^ 
+struct1.c:9:19: warning: variable ‘str3’ set but not used [-Wunused-but-set-variable] 
+	struct MyStruct str3; 
+					^~~~
+valy@staff:~/teaching$
+```
+
+#### Assignment
+- When assigning one struct's value to another, each value is copied in its corresponding type.
+- Under the hood, a ``memcpy`` is performed to copy every field from one struct to another.
+```C
+struct MyStruct{
+	int n;
+	char text[10];
+};
+
+int main(void){
+	struct MyStruct str1;
+	str1.n = 123;
+	strcpy(str1.text, "salut");
+	struct MyStruct str2;
+	str2 = str1; // equivalent to memcpy(&str2, &str1, sizeof(str1));
+	
+	return 0;
+}
+```
+#### Operations
+- We cannot use ``+, -, /, *, >, <, etc.`` operators between structs. We have to implement functions that can describe those operators (ex: ``addStructs(struct MyStruct a, struct MyStruct b)``). 
+
+- The **->** UNARY operator was invented to replace ``*().`` **when using pointers to structures**.
 ```C
 #include <stdlib.h> 
 #include <string.h> 
@@ -283,9 +343,22 @@ int main(void) {
 }
 ```
 
-TODO: Slide 281 (clase de precedenta si exemple pt operatorul unar ``->``)
+- The **->** operator has two roles:
+	- To access a member of a struct
+	- To dereference the member pointer
+- In any other context, the operator generates a compile error.
+- ``p->x++`` is equivalent to ``(p->x)++``
+- ``++p->x`` is equivalent to ``++(p->x)++``
+- ``*p->x`` is equivalent to ``*(p->x)``
+- ``*p->s++`` is equivalent to ``*((p->s)++)``
 
-
+#### Usages and considerations
+- Here are some usages of structs:
+	- We can use them to define arrays, which results in an efficient data organisation.
+	- We can use them as function arguments or return parameters (to return multiple values).
+- Considerations:
+	- Arrays of structs can be quite big which can result in a stack overflow.
+	- A recursive function that has a struct as its argument can result in a stack overflow if the struct is quite big. That's why we tend to pass structs around by their corresponding pointer in memory.
 ## Union
 - The difference between union and structs is that the memory is shared between all fields. The size will be the size of the biggest element inside the union.
 
@@ -312,5 +385,36 @@ int main(void){
 ```
 
 ## User-defined types
-``typedef definitie_tip identificator_nume_tip ;``
-TODO:
+- Allows us to 'rename' datatypes/arrays/existing user-defined types.
+
+- ``typedef definitie_tip identificator_nume_tip ;``
+
+```C
+#include <stdio.h> 
+#include <stdint.h> 
+#include <string.h> 
+typedef unsigned int MyUnsignedIntType; 
+typedef uint32_t MySpecialType; 
+typedef union MyUnion { 
+	uint32_t n; 
+	char text[4]; 
+}MyUnionType; 
+typedef struct { 
+	uint16_t x; 
+	MyUnionType t; 
+	double d; 
+}MyStructType; 
+
+int main(void) { 
+	MyUnsignedIntType n; 
+	MySpecialType special; 
+	MyUnionType myunion; 
+	MyStructType str; 
+	MyStructType *pstr; 
+	pstr = &str; 
+	pstr->t.n = 3; 
+	pstr->x = 16; 
+	
+	return 0; 
+}
+```
