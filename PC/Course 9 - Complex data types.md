@@ -7,7 +7,7 @@ enum my_enum{
 	constanta_3
 };
 ```
-- TODO: What happens behind the scenes when declaring an anonymous enum?
+- When you declare an anonymous enum like this, the compiler essentially treats the enumerator names as if they were simple integer constants.
 - Usage:
 ```C
 int main(){
@@ -56,7 +56,7 @@ int main(void){
 	// we can also use enums as pointers
 	enum saptamana *zi2;
 	zi2 = &zi;
-	zi2 = malloc(sizeof(enum saptamana)); // TODO: Check this
+	zi2 = malloc(sizeof(enum saptamana));
 	
 	free(zi);
 	
@@ -122,7 +122,7 @@ int main(void){
 }
 ```
 
-- Another alignment problem:
+- Another alignment problem (even though these two structs contain essentially the same fields, they will occupy different sizes):
 ```C
 #include <stdio.h>
 #include <stdint.h>
@@ -168,26 +168,95 @@ Output:
 			- (char)1 byte
 				- (padding)1 byte
 
-- By default, compilers leave struct allocation and alignment alone, but by specifying a flag it can realign them. TODO: Find flag
-
 - This can be very inefficient when declaring an array of structs. The solution is to assure that the fields are in order of their multiples, so the least amount of padding is allocated.
 
-#### Finding "deplasamentul" dintre structuri
-- With pointer difference
+- By default, compilers leave struct allocation and alignment alone, but by specifying a flag it can realign them.
 ```C
-struct my_struc{
-	uint32_t a;
-	uint16_t b;
-	char ch;
+#include <stdio.h>
+
+// This pragma is added to show the effect of -fpack-struct
+#pragma pack(1)
+
+// Define a structure with three members
+struct ExampleStruct {
+    char a;
+    int b;
+    char c;
+};
+
+// Restore the default packing
+#pragma pack()
+
+int main() {
+    // Print the size of the structure
+    printf("Size of struct: %zu\n", sizeof(struct ExampleStruct));
+
+    return 0;
 }
-int main(void){
-	char *p = (char*)&p;
-	char *q = (char*)&s.ch;
+```
+- In this example, the `#pragma pack(1)` directive is used to specify a packing of 1 byte for the structure. This means that the compiler should try to pack the structure members as tightly as possible, with no padding between members. The `#pragma pack()` directive is then used to restore the default packing after the structure definition.
+- When you compile this code with GCC, you can use the `-fpack-struct` flag to achieve the same effect (alternative to ``pragma`` directive):
+```Bash
+gcc -fpack-struct example.c -o example
+```
+- Keep in mind that using tight packing can have performance implications on some architectures, as accessing unaligned data may be slower than accessing aligned data. Additionally, relying on specific struct packing might make your code less portable across different compilers and architectures. Therefore, it's generally a good practice to be cautious when using such options and to be aware of the potential implications for portability and performance.
+#### Finding the distance between struct fields
+- By using pointer difference
+```C
+#include <stdio.h> 
+struct MyStruct { 
+	int n; 
+	char text[10]; 
+	float f; 
+}; 
+int main(void) { 
+	struct MyStruct str1; 
+	printf ("deplasament n: %ld\n", (char*)&str1.n - (char*)&str1); 
+	printf ("deplasament text: %ld\n", (char*)&str1.text - (char*)&str1); 
+	printf ("deplasament f: %ld\n", (char*)&str1.f - (char*)&str1); 
+	printf ("dimensiune structura: %ld\n", sizeof(str1)); 
+	
+	return 0; 
 }
 
 ```
-- With the ``offsetof`` macro:
-
+Output:
+```Bash
+valy@staff:~/teaching$ ./p 
+deplasament n: 0 
+deplasament text: 4 
+deplasament f: 16 
+dimensiune structura: 20 
+valy@staff:~/teaching$
+```
+- By using the ``offsetof`` macro (``offsetof(tip_struct, nume_camp)``) from the ``<stddef.h>`` library:
+```C
+#include <stdio.h> 
+#include <stddef.h> 
+struct MyStruct { 
+	int n; 
+	char text[10]; 
+	float f; 
+}; 
+int main(void) { 
+	struct MyStruct str1; 
+	printf ("deplasament n: %ld\n", offsetof(struct MyStruct, n)); 
+	printf ("deplasament text: %ld\n", offsetof(struct MyStruct, text)); 
+	printf ("deplasament f: %ld\n", offsetof(struct MyStruct, f)); 
+	printf ("dimensiune structura: %ld\n", sizeof(str1)); 
+	
+	return 0; 
+}
+```
+Output:
+```Bash
+valy@staff:~/teaching$ ./p 
+deplasament n: 0 
+deplasament text: 4 
+deplasament f: 16 
+dimensiune structura: 20 
+valy@staff:~/teaching$
+```
 #### Operations
 - Assignment between structs executes ``memcpy`` behind the scenes (slide 277).
 - We cannot use ``+, -, /, *, >, <, etc.`` operators between structs.
@@ -244,3 +313,4 @@ int main(void){
 
 ## User-defined types
 ``typedef definitie_tip identificator_nume_tip ;``
+TODO:
