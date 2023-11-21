@@ -94,3 +94,45 @@ int main(void){
     return 0;  
 }
 ```
+
+- Implement the following function ``char *text2hex(char *string)``
+	- ``ex: "abc" -> "616263"``
+```C
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define SIZE 1024
+char *hex2text(char *string){
+	// TODO: convert hex to txt
+}
+char *text2hex(char *string){
+	char *result = NULL;
+	if ( (result = malloc((strlen(string)*2+1)*sizeof(char))) == NULL){
+		return NULL;
+	}
+	result[0] = 0; // sau strcpy(result, "")
+	// sau memset(result, 0, (strlen(string)*2+1)*sizeof(char))
+	char aux[3];
+	for(int i=0;i<strlen(string); i++){
+		sprintf(aux, "%02X", string[i]);
+		strcat(result, aux);
+	}
+
+	return result;
+}
+
+int main(void){
+
+	char line[SIZE];
+	char *str = NULL;
+	if(fgets(line, SIZE, stdin) != NULL){
+		line[strlen(line)-1]=0;
+		if( (str = text2hex(line)) != NULL){
+			printf("result is: %s\n", str);
+		}
+	}
+	free(str);
+	return 0;
+}
+```
