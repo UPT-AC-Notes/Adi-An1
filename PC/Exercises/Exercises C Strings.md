@@ -98,3 +98,140 @@ int main(void){
     return 0;  
 }
 ```
+
+- Read a line from STDIN. Capitalise the first letter of each word
+```C
+#include <stdio.h>  
+#include <string.h>  
+#include <ctype.h>  
+#define SIZE 1024  
+  
+size_t read_line(char *line){  
+    if ( (line = fgets(line, SIZE, stdin)) != NULL ){  
+       return strlen(line);  
+    }  
+    return 0;  
+}  
+  
+void capitalizeFirstLetter(char *line, size_t size){  
+    char lastLetter = 0;  
+    for(int i=0;i<size;i++){  
+       if(isalpha(line[i]) && !isalpha(lastLetter)){  
+       line[i] = toupper(line[i]);      
+    }  
+       lastLetter = line[i];  
+    }    
+}  
+  
+void display_string(char *line, size_t size){  
+    for(int i=0;i<size;i++){  
+       printf("%c",line[i]);  
+    }  
+}  
+  
+  
+int main(void){  
+    char line[SIZE];  
+    size_t size = read_line(line);  
+  
+    capitalizeFirstLetter(line, size);  
+  
+    display_string(line, size);  
+}
+```
+
+- Write a function with the following header ``uint32_t upper_sub_string(char *str, const char *substr);``. This function should modify the string ``str`` so that each occurrence of the ``substr`` string will be capitalised.
+```C
+#include <stdio.h>  
+#include <ctype.h>  
+#include <string.h>  
+#include <stdint.h>  
+#define SIZE 1024  
+  
+size_t read_line(char *line){  
+    if ( (line = fgets(line, SIZE, stdin)) != NULL ){  
+       return strlen(line);     
+    }  
+    return 0;  
+}  
+  
+uint32_t upper_sub_string(char *str, const char *substr){  
+    char *found;  
+    uint32_t r = 0;  
+    while( (found = strstr(str, substr)) ){  
+       while(isalpha(*found)){  
+          *found = toupper(*found);  
+          found++;  
+       }  
+       r++;  
+    }  
+    return r;  
+  
+}  
+  
+void display_string(char *line, size_t size){  
+    for(int i=0;i<size;i++){  
+       printf("%c",line[i]);  
+    }  
+}  
+  
+int main(void){  
+    char line[SIZE];  
+    size_t size = read_line(line);  
+    uint32_t r = upper_sub_string(line, "ana");  
+      
+    display_string(line, size);  
+    printf("Number of replace operations: %d", r);  
+      
+      
+}
+```
+
+- Write a function with the following header ``uint32_t string_replace(char *where, const char *what, const char *replace)``. This function should replace every occurrence of the ``what`` string in the ``where`` string with the ``replace`` string.
+```C
+#include <stdio.h>  
+#include <ctype.h>  
+#include <string.h>  
+#include <stdint.h>  
+#define SIZE 1024  
+  
+void display_string(char *line, size_t size){  
+    for(int i=0;i<size;i++){  
+       printf("%c",line[i]);  
+    }  
+}  
+  
+uint32_t string_replace(char *where, const char *what, const char *replace){  
+      
+    char *found;  
+    uint32_t r = 0;  
+    while( (found = strstr(where, what)) ){  
+       char cpy[SIZE];  
+       strcpy(cpy, found+strlen(what));  
+       strcpy(found, replace);  
+       *(found+strlen(replace))='\0';  
+       strcat(where, cpy);  
+  
+       r++;  
+    }  
+    return r;  
+}  
+  
+int main(void){  
+      
+    char s1[1000];  
+    char s2[] = "string";  
+    char s3[] = "sir de caractere";  
+    strcpy(s1, "Acesta este un string si un string este terminat cu 0x00");  
+  
+    int r = string_replace(s1, s2, s3);      
+  
+    display_string(s1, strlen(s1));  
+    printf("\nNumber of replace operations: %d", r);  
+      
+      
+}
+```
+
+- ! Be very careful when using the ``fgets`` function to read a string, because it will also add the ``'\n'`` character at the end.
+	- This will result in buggy code when trying to search for a substring with ``strstr`` if the substring was read with ``fgets``.
