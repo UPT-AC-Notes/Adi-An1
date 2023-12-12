@@ -123,6 +123,7 @@ Invalid argument
 valy@staff:~/teaching$
 ```
 ## Files
+- [[Exercises Files]]
 - A file is a stream of bytes usually stored in a non-volatile storage media.
 - Information is stored in an unstructured way. The program chooses the way to interpret those bytes (ex. Image files, Music files, Text files, etc.)
 - File extensions are just a convention to help programs interpret specified files. Under the hood, all files are the same, even if the file extension is different.
@@ -136,11 +137,15 @@ valy@staff:~/teaching$
 		- ``a`` (append) - file will be opened in APPEND mode. If the file doesn't exist, it will be created. If the file already exists, the new content will be written continuous to the previous content.
 		- ``+`` - shortcut ( ``r+ -> rw``, ``w+ -> rw`` )
 		- ``b`` - file will be opened in BINARY mode
-	- TODO: Complete with return type
+	- Returns a pointer to a ``FILE`` struct pointer. Its fields are hidden and unaccessible.
+		- This pointer represents an unique way to identify the opened file in the program's scope until the end of the program or until it is explicitly closed. 
+		- This pointer will be passed to specialised functions that make file operations.
+	- Returns ``NULL`` in case of error (file does not exist, permission denied, etc.)
 
 - ``int fclose(FILE *stream);`` 
-	- Allows us to close the 
-	- TODO: Complete with return type, etc.
+	- Allows us to close the opened file.
+	- It's a bad practice to leave the files unclosed. However, the OS will take care of this and close any opened files when the program ends. 
+	- The function is not only used to close the file, but effectively write the data to the file. The OS doesn't physically write the data instantly, since it tries to optimise the writes. The ``fclose`` function also calls the ``flush`` function, which forces the OS to write the data to the file.
 ```C
 #include <stdio.h>  
 #include <stdlib.h>  

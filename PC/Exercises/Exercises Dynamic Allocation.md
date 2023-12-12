@@ -136,3 +136,64 @@ int main(void){
 	return 0;
 }
 ```
+
+- After each element in the array, insert its cube.
+```C
+#include <stdio.h>  
+#include <stdint.h>  
+#include <stdlib.h>  
+  
+#define CHUNK 64  
+  
+uint16_t *read_array(int *size){  
+    int current_size = 0, i=0;  
+    int nr = 0;  
+    uint16_t *arr = NULL;  
+    while(scanf("%d",&nr)==1){  
+        if(i==current_size){  
+            current_size += CHUNK;  
+            arr = realloc(arr, current_size * sizeof(uint16_t));  
+        }  
+        arr[i++] = nr;  
+    }  
+    arr = realloc(arr, i * sizeof(uint16_t));  
+    *size = i;  
+    return arr;  
+}  
+  
+void cube_elements_array(uint16_t **arr, int *size){  
+    *size = 2 * (*size);  
+    *arr = realloc(*arr, (*size)*sizeof(uint16_t));  
+  
+    int current_size = (*size)/2;  
+    for(int i=0;i<current_size;i+=2){  
+        current_size++;  
+        for(int j = current_size-1; j>i; j--){  
+            (*arr)[j] = (*arr)[j-1];  
+        }  
+        (*arr)[i+1] = (*arr)[i]*(*arr)[i]*(*arr)[i];  
+    }  
+}  
+  
+void display_array(uint16_t *arr, int size){  
+    for(int i=0;i<size;i++){  
+        printf("%d ",arr[i]);  
+    }  
+    printf("\n");  
+}  
+  
+  
+int main(void){  
+    int size = 0;  
+    uint16_t *arr = read_array(&size);  
+  
+    display_array(arr,size);  
+  
+    cube_elements_array(&arr, &size);  
+    display_array(arr,size);  
+  
+    free(arr);  
+  
+    return 0;  
+}
+```

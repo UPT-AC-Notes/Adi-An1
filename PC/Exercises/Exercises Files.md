@@ -78,3 +78,76 @@ int main(void){
     return 0;  
 }
 ```
+
+- Read fields from a CSV file:
+```C
+#include <stdio.h>  
+#include <stdlib.h>  
+#include <stdint.h>  
+#include <string.h>  
+  
+// http://staff.cs.upt.ro/~valy/pt/movies.csv  
+// from this file we need field 0,2,6  
+  
+#define LINE_SIZE 4096  
+#define TITLE_SIZE 256  
+  
+typedef struct{  
+    uint16_t year;  
+    char title[TITLE_SIZE+1];  
+    uint32_t budget;  
+}MOVIE;  
+  
+int process_movie(char *line, MOVIE *m){  
+    char *p;  
+    if((p=strtok(line,","))==NULL){  
+        return 1;  
+    }  
+    for(int i=0;i<7;i++){  
+        switch (i) {  
+            case 0:  
+                m->year = strtol(p, NULL, 10);  
+                break;  
+            case 2:  
+                strcpy(m->title, p);  
+                break;  
+            case 6:  
+                m->budget = strtol(p, NULL, 10);  
+                break;  
+        }  
+        if((p=strtok(NULL,","))==NULL){  
+            return 1;  
+        }  
+    }  
+    return 0;  
+}  
+void printMovie(const MOVIE *m){  
+    printf("year: %4d ",m->year);  
+    printf("title: %s ",m->title);  
+    printf("budget: %d ",m->budget);  
+    printf("\n");  
+}  
+  
+int main(void){  
+  
+    FILE *f = NULL;  
+    char line[LINE_SIZE];  
+    MOVIE aux;  
+  
+    if( (f=fopen("movies.csv", "r")) == NULL){  
+        perror(NULL);  
+        exit(-1);  
+    }  
+  
+    while(fgets(line,LINE_SIZE,f) != NULL){  
+        if(process_movie(line, &aux)==0){  
+            printMovie(&aux);  
+        }  
+    }  
+  
+    if(fclose(f) !=0){  
+        perror(NULL);  
+        exit(-2);  
+    }  
+}
+```
