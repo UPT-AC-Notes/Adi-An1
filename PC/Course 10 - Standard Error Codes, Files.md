@@ -221,11 +221,28 @@ int main(void) {
 }
 ```
 
-- TODO: COMPLETE From course 
+- ``int fputc(int c, FILE *stream);``
+	- Writes the character ``c`` in the file
+	- Increments the cursor by one
+	- Returns the written character or ``NULL`` if an error was encountered
+
+- ``int ungetc(int c, FILE *stream);``
+	- Pushes the ``c`` character back into the file stream where it is available for subsequent read operations.  Pushed-back characters will be returned in reverse order
+	- Only one pushback is guaranteed. 
+	
+- ``int fputs(const char *s, FILE *stream);``
+	- Writes the string ``s`` to the file stream. 
+	- It doesn't write the ``NULL`` character present at the end of the string
+	- Increments the cursor by adding the length of the written string
+	- Returns a non-negative number on success and ``EOF`` in case of an error.
+
+- ``int feof(FILE *stream);``
+	- Tests if the file's cursor reached ``EOF``. If this happened it returns a non-zero value
+		- If the cursor didn't reach ``EOF``, the function returns 0.
 
 - Additional file-write functions:
-- ``fprintf`` - works exactly as ``printf``, but writes the output tot a FILE.
-- ``fscanf`` - works exactly as ``scanf``, but it reads from a FILE.
-
-- ``sprintf`` - works exactly as ``printf``, but writes the output tot a string.
-- ``sscanf`` - works exactly as ``scanf``, but it reads from a string.
+	- ``fprintf`` - works exactly as ``printf``, but writes the output tot a FILE.
+	- ``fscanf`` - works exactly as ``scanf``, but it reads from a FILE.
+	
+	- ``sprintf`` - works exactly as ``printf``, but writes the output tot a string.
+	- ``sscanf`` - works exactly as ``scanf``, but it reads from a string.
