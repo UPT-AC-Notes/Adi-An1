@@ -134,3 +134,4 @@ int main(void){
     printf("resolution: %dx%d\n", width, height);  
 }
 ```
+
