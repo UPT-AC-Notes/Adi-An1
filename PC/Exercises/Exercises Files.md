@@ -151,3 +151,122 @@ int main(void){
     }  
 }
 ```
+
+```C
+// Judet;Populatie;Beneficiari plãtiti;Beneficiari suspendati la sfârsit de lunã;Suma totalã plãtitã drepturi curente;Alte plati  
+// wget http://staff.cs.upt.ro/~valy/pt/indemnizatie.csv  
+#include <stdio.h>  
+#include <stdlib.h>  
+#include <string.h>  
+#include <stdint.h>  
+#define LINE_LENGTH 256  
+#define JUDET_LENGTH 128  
+#define ALLOC_CHUNK 64  
+typedef struct{  
+    char judet[JUDET_LENGTH+1];  
+    uint32_t b_p;  
+    uint32_t s;  
+}DATA;  
+  
+char *get_string(char *s){  
+    int i = 0, current_size = 0;  
+    char *result = NULL;  
+    while(*s!='\n' && *s!='\0' && *s!=';'){  
+        if(i==current_size){  
+            current_size += ALLOC_CHUNK;  
+            result = realloc(result, current_size*sizeof(char));  
+            if(result==NULL){  
+                fprintf(stderr, "Error allocating memory\n");  
+                exit(-2);  
+            }  
+        }  
+        result[i++] = *s;  
+        s = s + 1;  
+    }  
+    result[i]='\0';  
+    return result;  
+}  
+  
+DATA *get_data_from_line(char *line){  
+    DATA *output = malloc(1*sizeof(DATA));  
+    char *judet = get_string(line);  
+  
+    strcpy(output->judet,judet);  
+    free(judet);  
+  
+    char *p=strtok(line,";");  
+    p = strtok(NULL, ";");  
+  
+    char *b_p = get_string(p);  
+    output->b_p = strtol(b_p, NULL, 10);  
+    free(b_p);  
+  
+    for(int i=1;i<=3;i++){  
+        p = strtok(NULL,";");  
+    }  
+  
+    char *s = get_string(p);  
+    output->s = strtol(s, NULL, 10);  
+    free(s);  
+  
+    return output;  
+}  
+  
+DATA* add_to_array(DATA *arr, int *size, DATA *elm){  
+    static int i = 0;  
+    static int current_size = 0;  
+    if(i==current_size){  
+        current_size += ALLOC_CHUNK;  
+        arr = realloc(arr, current_size*sizeof(DATA));  
+        if(arr==NULL){  
+            fprintf(stderr, "Error allocating memory\n");  
+            exit(-1);  
+        }  
+    }  
+    arr[i++] = *elm;  
+    free(elm);  
+    *size = i;  
+    return arr;  
+}  
+  
+void print_array(DATA *arr, int size){  
+    for(int i=0;i<size;i++){  
+        printf("judet: %s - p_n: %d - s: %d\n", arr[i].judet, arr[i].b_p, arr[i].s);  
+    }  
+}  
+  
+int main(int argc, char **argv){  
+    if(argc!=2){  
+        fprintf(stderr,"Incorrect number of arguments provided!\n");  
+        exit(-2);  
+    }  
+  
+    FILE *f = fopen(argv[1],"r");  
+    if(f==NULL){  
+        perror(NULL);  
+        exit(-1);  
+    }  
+  
+    char line[LINE_LENGTH];  
+    DATA *arr = NULL;  
+    int size = 0;  
+  
+    fgets(line,LINE_LENGTH,f);  
+    while(fgets(line, LINE_LENGTH, f)){  
+        DATA* d = get_data_from_line(line);  
+        arr = add_to_array(arr, &size, d);  
+    }  
+  
+  
+    if(fclose(f)!=0){  
+        perror(NULL);  
+        exit(-1);  
+    }  
+  
+  
+    print_array(arr,size);  
+    free(arr);  
+  
+    return 0;  
+}
+```

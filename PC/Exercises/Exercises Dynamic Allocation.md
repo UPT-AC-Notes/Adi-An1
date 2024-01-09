@@ -197,3 +197,118 @@ int main(void){
     return 0;  
 }
 ```
+
+```C
+#include <stdio.h>  
+#include <stdlib.h>  
+#include <string.h>  
+  
+int compute_size(const char* where, const char* what, const char* replace){  
+    int what_count = 0;  
+    char *s = strstr(where, what);  
+    while(s){  
+        what_count++;  
+        s = strstr(s+1,what);  
+    }  
+    return strlen(where)-what_count*strlen(what)+what_count*strlen(replace);  
+}  
+  
+int is_what_at_current(const char* where, const char* what){  
+    for(int i=0;i<strlen(what);i++){  
+        if(where[i]!=what[i]){  
+            return 0;  
+        }  
+    }  
+    return 1;  
+}  
+  
+char *string_replace(const char* where, const char* what, const char* replace){  
+    char *result = (char*)malloc((compute_size(where, what, replace)+1)*sizeof(char));  
+    int r_i = 0;  
+  
+    for(int i=0;i<strlen(where);i++){  
+        if(is_what_at_current(where+i,what)){  
+            for(int j=0;j<strlen(replace);j++){  
+                result[r_i++] = replace[j];  
+            }  
+            i+=strlen(what)-1;  
+        }else{  
+            result[r_i++] = where[i];  
+        }  
+  
+    }  
+    result[r_i] = 0;  
+    return result;  
+}  
+  
+int main(void){  
+  
+    char *s = string_replace("ana are multe mere", "multe", "123456789");  
+    printf("%s\n",s);  
+  
+    free(s);  
+  
+    return 0;  
+}
+```
+
+```C
+#include <stdio.h>  
+#include <ctype.h>  
+#include <stdlib.h>  
+#include <string.h>  
+// a -> apa  
+// e -> epe  
+// i -> ipi  
+// o -> opo // u -> upu  
+int isVowel(char c){  
+    char l = tolower(c);  
+    return l == 'a' || l == 'e' || l == 'i' || l == 'o' || l == 'u';  
+}  
+char *dic(char c){  
+    if(isVowel(c)){  
+        char *r = (char*)malloc(3*sizeof(char));  
+        r[0]=c;  
+        r[2]=c;  
+        if(isupper(c)){  
+            r[1]='P';  
+        }else{  
+            r[1]='p';  
+        }  
+        return r;  
+    }  
+    return NULL;  
+}  
+char *pasareasca(const char* text){  
+    int nVowels = 0;  
+    for(int i=0;i<strlen(text);i++){  
+        if(isVowel(text[i])){  
+            nVowels++;  
+        }  
+    }  
+    int size = strlen(text) + 2*nVowels;  
+    char *result = (char*)malloc(size*sizeof(char)+1);  
+    int r_i = 0;  
+    for(int i=0;i<strlen(text);i++){  
+        if(!isVowel(text[i])){  
+            result[r_i++] = text[i];  
+        }else{  
+            char *d_r = dic(text[i]);  
+            for(int j=0;j<3;j++){  
+                result[r_i++] = d_r[j];  
+            }  
+            free(d_r);  
+        }  
+    }  
+    result[r_i]=0;  
+    return result;  
+}  
+int main(void){  
+  
+    char *r = pasareasca("apa");  
+    printf("%s\n", r);  
+    free(r);  
+  
+    return 0;  
+}
+```
