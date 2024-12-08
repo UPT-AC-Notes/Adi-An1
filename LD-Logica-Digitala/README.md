@@ -1,0 +1,2 @@
+- For the best experience use the [Obsidian Markdown Viewer](https://obsidian.md/) (clone the repo and open it as a vault).
+	- This facilitates easy image and Latex preview
